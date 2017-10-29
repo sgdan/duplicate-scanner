@@ -1,18 +1,18 @@
 port module Ports exposing (..)
 
 type alias FileInfo = {
-    name : String,
+    path : String,
     size : Int
 }
 
 type alias FileHash = {
-    name : String,
+    path : String,
     hash : String
 }
 
 -- messages from UI to System
 port openFolder: () -> Cmd msg
-port hashFile: String -> Cmd msg
+port hashFiles: List String -> Cmd msg
 port deleteFile: String -> Cmd msg
 
 -- messages from System to UI

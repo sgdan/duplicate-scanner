@@ -17,7 +17,7 @@ function sendFilesFrom(dir) {
                 if (stats.isFile()) {
                     var size = stats.size
                     if (size > 0) elmApp.ports.addFile.send({
-                        name: entry,
+                        path: entry,
                         size: size
                     })
                     console.log("adding " + entry + " of size " + size)
@@ -40,5 +40,8 @@ elmApp.ports.openFolder.subscribe(() => {
             sendFilesFrom(dir)
         }
     );
+});
     
-})
+elmApp.ports.hashFiles.subscribe(files => {
+    console.log('request to hash files: ' + files)
+});
