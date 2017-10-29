@@ -12,27 +12,46 @@ Uses Elm for the UI code and runs on Electron. File system operations are writte
 - See following links which are very helpful setting up the environment:
   * https://github.com/johnomarkid/elm-electron-webpack
   * https://medium.com/@ezekeal/building-an-electron-app-with-elm-part-1-boilerplate-3416a730731f
-- Assumes the following tools are installed: NodeJS, Elm, Electron, webpack-dev-server
-- Install Elm packages:
+- Install NodeJS from https://nodejs.org/
+- Install Electron, Elm, webpack via npm
+```
+npm install -g --verbose electron
+npm install -g --verbose elm
+npm install -g --verbose webpack
+npm install -g --verbose webpack-dev-server
+```
+
+- Install Elm packages from the project folder:
 ```
 elm package install elm-lang/html
 ```
-- Elm Webpack loader must be installed:
+
+- Install elm webpack loader from the project folder
+**Note: This didn't work until I reinstalled elm via the Windows exe
+   rather than the npm as described above.**
 ```
-npm install --save elm-webpack-loader
+npm install --save --verbose elm-webpack-loader
+```   
+
+- Keep webpack dev server running in one console...
 ```
-- Use electron to run and provide debug tools
+webpack-dev-server
+```
+
+- ... and run electron in another to run and provide debug tools
 ```
 electron main.js
 ```
+
 # How to use
 
 - Click the "Open Folder" button and browse to a local folder
 - UI will show number of files checked and number of potential duplicates
 
-# TODO features not implemented yet
+# TODO
 
 - Compute md5sum hash values for files of the same size to see if they're duplicates
 - Display duplicate file groups in the UI
 - Provide delete option in the UI so duplicate files can be removed
 - Package into executable format
+- List by update date as well as size? sort in UI?
