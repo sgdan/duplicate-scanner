@@ -16,7 +16,7 @@ app.on('ready', function() {
     height: 768
   })
 
-  mainWindow.loadURL(`file://${ __dirname }/src/static/index.html`)
+  mainWindow.loadURL(`file://${ __dirname }/src/renderer/index.html`)
   mainWindow.webContents.openDevTools()
   mainWindow.on('closed', function () {
     mainWindow = null

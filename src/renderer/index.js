@@ -1,4 +1,4 @@
-var Elm = require('../elm/Main');
+var Elm = require('./Main');
 var container = document.getElementById('container');
 var elmApp = Elm.Main.embed(container);
 var dialog = require('electron').remote.dialog

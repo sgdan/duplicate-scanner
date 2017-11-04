@@ -1,6 +1,6 @@
 module.exports = {
     target: 'electron-main',
-    entry: './src/static/index.js',
+    entry: './src/renderer/index.js',
     output: {
         path: __dirname + '/dist',
         publicPath: '/assets/',
