@@ -12,7 +12,7 @@ type alias FileHash = {
 
 -- messages from UI to System
 port openFolder: () -> Cmd msg
-port hashFiles: List String -> Cmd msg
+port hashFile: String -> Cmd msg
 port deleteFile: String -> Cmd msg
 
 -- messages from System to UI

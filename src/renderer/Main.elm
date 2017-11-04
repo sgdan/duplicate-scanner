@@ -31,6 +31,7 @@ type Msg = OpenFolder
     | Clear
     | DirAdded String
     | FileAdded FileInfo
+    | HashAdded FileHash
 
 main: Program Never Model Msg
 main = program {
@@ -50,16 +51,22 @@ emptyModel = {
     byHash = Dict.empty
     }
 
--- Add file to the existing set, or create a new set if there isn't any existing
-addFileSize: String -> Maybe PathSet -> Maybe PathSet
-addFileSize new existing = Just <| case existing of
+-- Add path to existing set, or create new set if no existing
+addPath: String -> Maybe PathSet -> Maybe PathSet
+addPath new existing = Just <| case existing of
     Just existing -> Set.insert new existing
     Nothing -> Set.singleton new
 
 -- Update the size map with the give file info
 updateBySize: FileInfo -> Model -> Model
 updateBySize info model = {
-    model | bySize = Dict.update info.size (addFileSize info.path) model.bySize    
+    model | bySize = Dict.update info.size (addPath info.path) model.bySize    
+    }
+
+updateByHash: FileHash -> Model -> Model
+updateByHash data model = {
+    model | byHash = Dict.update data.hash (addPath data.path) model.byHash,
+        hashing = Set.remove data.path model.hashing
     }
 
 -- Create command to hash files that require it and ensure the
@@ -67,9 +74,8 @@ updateBySize info model = {
 requestHash: PathSet -> Model -> (Model, Cmd Msg)
 requestHash paths model =
     if Set.isEmpty paths then (model, Cmd.none)
-    else (
-        { model | hashing = Set.union model.hashing paths },
-        Set.toList paths |> hashFiles)
+    else { model | hashing = Set.union model.hashing paths }
+        ! (Set.toList paths |> List.map hashFile)
 
 -- Figure out which files we need to request hash sums for
 -- this means possible duplicates minus already hashed, minus hashing
@@ -106,6 +112,8 @@ update msg model =
         FileAdded value -> requestHash (findToHash model) 
             <| updateBySize value model
 
+        HashAdded value -> (updateByHash value model, Cmd.none)
+
 -- VIEW
 view : Model -> Html Msg
 view model = div [][
@@ -126,12 +134,17 @@ view model = div [][
 
     -- List files being hashed
     div [][
-        text ("Hashing: " ++ (toString model.hashing))
+        text ("Hashing: " ++ (toString (Set.size model.hashing)))
     ],
 
+    -- List files being hashed
+    div [][
+        text ("byHash: " ++ (toString (Dict.size model.byHash)))
+    ]
+
     -- Results of scan here
-    br[][],
-    sizesList (sameSize model.bySize)
+    --br[][],
+    --sizesList (sameSize model.bySize)
     ]
 
 {--
@@ -189,4 +202,5 @@ buttonStyle = style [
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.batch [
     addDir DirAdded,
-    addFile FileAdded]
+    addFile FileAdded,
+    addHash HashAdded]
