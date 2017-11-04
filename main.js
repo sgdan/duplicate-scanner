@@ -1,24 +1,48 @@
-// see https://tutorialzine.com/2015/12/creating-your-first-desktop-app-with-html-js-and-electron
+const { ipcMain, BrowserWindow, app } = require('electron')
+const cpus = require('os').cpus().length
 
-const electron = require('electron')
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow
+// stack of available background threads
+var available = []
+
+// queue of tasks to be done
+var tasks = []
+
+// hand the tasks out to waiting threads
+function doIt() {
+  while (available.length > 0 && tasks.length > 0) {
+    var task = tasks.shift()
+    available.shift().send(task[0], task[1])
+  }
+  renderer.webContents.send('status', available.length, tasks.length)
+}
+
+// Create a hidden background window
+function createBgWindow() {
+  result = new BrowserWindow({ "show": false })
+  result.loadURL('http://localhost:8080/assets/bg.bundle.js')
+  result.on('closed', () => {
+    console.log('background window closed')
+  });
+  return result
+}
 
 let mainWindow
 
-app.on('window-all-closed', function() {
-  if (process.platform != 'darwin') app.quit();  
+app.on('window-all-closed', function () {
+  if (process.platform != 'darwin') app.quit();
 })
 
-app.on('ready', function() {
+app.on('ready', function () {
   mainWindow = new BrowserWindow({
-    width: 1200, 
+    width: 1200,
     height: 768
   })
-
-  mainWindow.loadURL(`file://${ __dirname }/src/renderer/index.html`)
+  mainWindow.loadURL(`file://${__dirname}/src/renderer/index.html`)
   mainWindow.webContents.openDevTools()
   mainWindow.on('closed', function () {
-    mainWindow = null
+    app.quit() // exit so background windows won't keep app running
   })
+
+  // create background thread for each cpu
+  for (var i = 0; i < cpus; i++) createBgWindow()
 })
