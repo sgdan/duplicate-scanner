@@ -2,16 +2,19 @@
   "name": "duplicate-scanner",
   "version": "0.0.1",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -k \"webpack-dev-server\" \"electron .\""
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "elm-webpack-loader": "^4.3.1"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "electron-prebuilt-compile": "^1.7.9"
+    "concurrently": "3.5.0",
+    "electron": "1.7.9",
+    "elm-webpack-loader": "4.4.0",
+    "webpack": "3.8.1",
+    "webpack-dev-server": "2.9.4"
   }
 }

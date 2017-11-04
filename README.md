@@ -12,35 +12,15 @@ Uses Elm for the UI code and runs on Electron. File system operations are writte
 - See following links which are very helpful setting up the environment:
   * https://github.com/johnomarkid/elm-electron-webpack
   * https://medium.com/@ezekeal/building-an-electron-app-with-elm-part-1-boilerplate-3416a730731f
-- Install NodeJS from https://nodejs.org/
-- Install Electron, Elm, webpack via npm
+- Install NodeJS from https://nodejs.org/, Yarn from https://yarnpkg.com/lang/en/
+- Install local packages
 ```
-npm install -g --verbose electron
-npm install -g --verbose elm
-npm install -g --verbose webpack
-npm install -g --verbose webpack-dev-server
+yarn install
+elm package install
 ```
-
-- Install Elm packages from the project folder:
+- Run in dev mode
 ```
-elm package install elm-lang/html
-```
-
-- Install elm webpack loader from the project folder
-**Note: This didn't work until I reinstalled elm via the Windows exe
-   rather than the npm as described above.**
-```
-npm install --save --verbose elm-webpack-loader
-```   
-
-- Keep webpack dev server running in one console...
-```
-webpack-dev-server
-```
-
-- ... and run electron in another to run and provide debug tools
-```
-electron main.js
+yarn dev
 ```
 
 # How to use
