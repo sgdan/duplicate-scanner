@@ -45,6 +45,7 @@ app.on('ready', function () {
   // search for non-empty files in the given folder
   ipcMain.on('check-folder', (event, arg) => {
     tasks.push(['check-folder', arg])
+    renderer.webContents.send('add-dir', arg)
     doIt()
   })
 

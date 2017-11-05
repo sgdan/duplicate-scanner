@@ -96,6 +96,20 @@ hashed model = Dict.foldl (\k v acc ->
         Set.union acc v
     ) Set.empty model.byHash
 
+-- To keep only the root paths in the list
+isChild a b = String.startsWith a b && not (a == b)
+hasParentIn path list = List.any (\v -> isChild v path) list
+parentsFrom paths = List.filter (\v -> not (hasParentIn v paths)) paths
+
+-- Add a directory and remove any child folders
+addFolder: String -> Model -> Model
+addFolder dir model = {
+    model | dirs = parentsFrom (dir :: Set.toList model.dirs) |> Set.fromList }
+    {--
+    Set.filter (\i -> True) {--isChild i model.dirs)--}
+        (Set.insert dir model.dirs)
+    }--}
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
@@ -106,11 +120,11 @@ update msg model =
         -- MESSAGES FROM SYSTEM TO UI:
 
         -- Add the opened folder to the list
-        DirAdded value -> ({ model | dirs = Set.insert value model.dirs }, Cmd.none)
+        DirAdded value -> (addFolder value model, Cmd.none)
 
         -- Add the file name and size data to the model
-        FileAdded value -> requestHash (findToHash model) 
-            <| updateBySize value model
+        FileAdded value -> --requestHash (findToHash model) 
+            (updateBySize value model, Cmd.none)
 
         HashAdded value -> (updateByHash value model, Cmd.none)
 

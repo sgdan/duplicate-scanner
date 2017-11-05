@@ -14,7 +14,6 @@ elmApp.ports.openFolder.subscribe(() => {
             if (dirs === undefined) return
             let dir = dirs[0]
             ipcRenderer.send('check-folder', dir)
-            elmApp.ports.addDir.send(dir)
         }
     )
 })
