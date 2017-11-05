@@ -1,8 +1,10 @@
+'use strict';
+
 const { ipcRenderer } = require('electron')
-var Elm = require('./Main')
-var container = document.getElementById('container')
-var elmApp = Elm.Main.embed(container)
-var dialog = require('electron').remote.dialog
+let Elm = require('./Main')
+let container = document.getElementById('container')
+let elmApp = Elm.Main.embed(container)
+let dialog = require('electron').remote.dialog
 
 // open the folder, send info of files within
 elmApp.ports.openFolder.subscribe(() => {
@@ -10,8 +12,8 @@ elmApp.ports.openFolder.subscribe(() => {
         { properties: ['openDirectory'] },
         (dirs) => {
             if (dirs === undefined) return
-            var dir = dirs[0]
-            ipcRenderer.send('open-folder', dir)
+            let dir = dirs[0]
+            ipcRenderer.send('check-folder', dir)
             elmApp.ports.addDir.send(dir)
         }
     )

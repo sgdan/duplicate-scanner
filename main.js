@@ -1,19 +1,22 @@
+'use strict';
+
 const { ipcMain, BrowserWindow, app } = require('electron')
-const cpus = 1 //require('os').cpus().length
+const cpus = 3 //require('os').cpus().length
 
 // stack of available background threads
-var available = []
+let available = []
 
 // queue of tasks to be done
-var tasks = []
+let tasks = []
 
 let renderer
 
 // hand the tasks out to waiting threads
 function doIt() {
   while (available.length > 0 && tasks.length > 0) {
-    var task = tasks.shift()
-    available.shift().send(task[0], task[1])
+    let task = tasks.shift()
+    let thread = available.shift()
+    thread.send(task[0], task[1])
   }
 }
 
@@ -27,14 +30,21 @@ app.on('ready', function () {
   })
 
   // create a background thread for each cpu
-  for (var i = 0; i < cpus; i++) {
-    new BrowserWindow({ "show": false })
-      .loadURL(`file://${__dirname}/src/background/bg.html`)
+  for (let i = 0; i < cpus; i++) {
+    let bg = new BrowserWindow({ "show": false })
+    bg.loadURL(`file://${__dirname}/src/background/bg.html`)
+    //bg.webContents.openDevTools()
   }
 
+  // check if the path is a file or folder
+  ipcMain.on('check-path', (event, arg) => {
+    tasks.push(['check-path', arg])
+    doIt()
+  })
+
   // search for non-empty files in the given folder
-  ipcMain.on('open-folder', (event, arg) => {
-    tasks.push(['open-folder', arg])
+  ipcMain.on('check-folder', (event, arg) => {
+    tasks.push(['check-folder', arg])
     doIt()
   })
 
@@ -44,7 +54,7 @@ app.on('ready', function () {
     doIt()
   })
 
-  // messages from the background thread tor the UI
+  // messages from the background thread for the UI
   ipcMain.on('add-file', (event, arg) => {
     renderer.webContents.send('add-file', arg)
   })
@@ -61,5 +71,10 @@ app.on('ready', function () {
   // log message from bg thread
   ipcMain.on('log', (event, arg) => {
     console.log(arg)
+  })
+
+  // error messages from bg or UI
+  ipcMain.on('error', (event, arg) => {
+    console.error('error: ' + arg)
   })
 })
