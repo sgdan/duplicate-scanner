@@ -1,11 +1,13 @@
 module Main exposing (..)
 
-import Html exposing (li, text, ul, button, program, div, Html, Attribute, fieldset, br)
+import Html exposing (..)
 import Html.Events exposing (on, onClick)
 import Html.Attributes exposing (..)
 import Ports exposing (..)
 import Dict exposing (Dict)
 import Set exposing (Set)
+import FormatNumber exposing (format)
+import FormatNumber.Locales exposing (usLocale)
 
 -- MODEL
 
@@ -97,8 +99,13 @@ hashed model = Dict.foldl (\k v acc ->
     ) Set.empty model.byHash
 
 -- To keep only the root paths in the list
+isChild : String -> String -> Bool
 isChild a b = String.startsWith a b && not (a == b)
+
+hasParentIn : String -> List String -> Bool
 hasParentIn path list = List.any (\v -> isChild v path) list
+
+parentsFrom: List String -> List String
 parentsFrom paths = List.filter (\v -> not (hasParentIn v paths)) paths
 
 -- Add a directory and remove any child folders
@@ -132,8 +139,7 @@ update msg model =
 view : Model -> Html Msg
 view model = div [][
     -- List of open folders, blank if nothing selected
-    Set.toList model.dirs
-        |> folderList,
+    Set.toList model.dirs |> folderList,
 
     -- Open/Clear buttons
     fieldset [defaultStyle][
@@ -154,11 +160,14 @@ view model = div [][
     -- List files being hashed
     div [][
         text ("byHash: " ++ (toString (Dict.size model.byHash)))
-    ]
+    ],
 
     -- Results of scan here
-    --br[][],
-    --sizesList (sameSize model.bySize)
+    br[][],
+    div [][
+        text "Potential duplicates by file size:",
+        select [selectStyle] (sizesList (sameSize model.bySize))
+    ]
     ]
 
 {--
@@ -174,26 +183,28 @@ numFilesChecked bySize =
     Dict.foldl (\k v acc -> acc + (Set.size v)) 0 bySize
     |> toString
 
--- Turn set of same-size files into a display line
-sizeListEntry: Int PathSet -> Html Msg
-sizeListEntry size =
-    "size: " ++ (toString size) ++ ": " --++ (toString files)
-    |> text
+formatSize: Int -> String
+formatSize k =
+    if k > 1000000000 then format usLocale (toFloat k / 1000000000.0) ++ " GB"
+    else if k > 1000000 then format usLocale (toFloat k / 1000000.0) ++ " MB"
+    else if k > 1000 then format usLocale (toFloat k / 1000.0) ++ " KB"
+    else toString k ++ " B"
 
-sizesList: Dict Int PathSet -> Html Msg
+sizesList : Dict Int a -> List (Html msg)
 sizesList entries = 
-    if Dict.isEmpty entries then text ""
-    else div [][
-        text "Potential duplicates by file size:",
-        ul [] (Dict.foldl (
-            \k v acc -> (li [] [text (
-                -- here is the line for this group of same-size files
-                "size: " ++ (toString k) ++ " bytes, " ++ (toString (Set.size v)) ++ " files"
-            )]) :: acc
-        ) [] entries) 
-    ]
+    -- leave the first item blank
+    option [] [text ""] ::
 
-folderList: List String -> Html Msg
+    (Dict.foldl (\k v acc -> (option [][
+            -- Size of the set of potentially duplicate files
+            text (formatSize k)
+            --text (toString k)
+        ]) :: acc
+    ) [] entries) 
+    
+--}
+
+folderList : List String -> Html msg
 folderList entries = case entries of
     [] -> text ""
     _ -> div [][
@@ -212,6 +223,11 @@ defaultStyle = style [
 buttonStyle: Attribute msg
 buttonStyle = style [
     ("margin", "10px")]
+
+selectStyle: Attribute msg
+selectStyle = style [
+    ("border", "1"),
+    ("width", "100%")]
 
 subscriptions : Model -> Sub Msg
 subscriptions model = Sub.batch [
