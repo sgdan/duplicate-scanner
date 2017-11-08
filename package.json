@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "elm-test",
     "dev": "concurrently -k \"webpack-dev-server\" \"electron .\""
   },
   "author": "",
@@ -14,6 +14,8 @@
     "bluebird": "3.5.1",
     "concurrently": "3.5.0",
     "electron": "1.7.9",
+    "elm-format": "0.6.1-alpha",
+    "elm-test": "0.18.9",
     "elm-webpack-loader": "4.4.0",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.9.4"
