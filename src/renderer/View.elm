@@ -29,8 +29,7 @@ view model =
         , br [] []
         , div []
             [ text "Potential duplicates by file size:"
-            , --text toString model.selected, -- targetValue is Json.Decoder String
-              select [ selectStyle, onChange SelectSize ] (sizesList (sameSize model.bySize))
+            , select [ selectStyle, onChange SelectSize ] <| sizesList <| sameSize model
             ]
         , br [] []
         , div []
@@ -53,10 +52,10 @@ formatSize k =
         toString k ++ " B"
 
 
-sizeOption : Int -> Html msg
-sizeOption bytes =
+sizeOption : Int -> Int -> Html msg
+sizeOption bytes n =
     option [ toString bytes |> value ]
-        [ formatSize bytes |> text ]
+        [ toString n ++ " files of size " ++ formatSize bytes |> text ]
 
 
 sizesList : Dict Int PathSet -> List (Html msg)
@@ -65,7 +64,7 @@ sizesList entries =
     option [ value "" ] [ text "" ]
         :: (Dict.foldl
                 (\k v acc ->
-                    sizeOption k
+                    sizeOption k (Set.size v)
                         :: acc
                 )
                 []
@@ -103,14 +102,14 @@ numFilesChecked bySize =
 
 
 {--
-    Return only entries where there's more than one file. We only want to
-    compute hash values for files that are the same size.
+   Return only entries where there's more than one file. We only want to
+   compute hash values for files that are the same size.
 --}
 
 
-sameSize : Dict Int PathSet -> Dict Int PathSet
-sameSize entries =
-    Dict.filter (\k v -> (Set.size v) > 1) entries
+sameSize : Model -> Dict Int PathSet
+sameSize model =
+    Dict.filter (\k v -> (Set.size v) > 1) model.bySize
 
 
 defaultStyle : Attribute msg

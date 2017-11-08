@@ -25,17 +25,13 @@ type alias HashBySize =
 
 
 type alias Model =
-    { dirs : PathSet
-    , -- names of the root folders we've scanned
-      bySize : PathsBySize
-    , -- map files by size so we know what to hash
-      hashBySize : HashBySize
-    , -- map size to set of hash values
-      hashing : PathSet
-    , -- waiting for md5sum to be returned by system
-      byHash : PathsByHash
-    , -- map by hash
-      selected : Maybe Int -- current size selection
+    { dirs : PathSet -- names of the root folders we've scanned
+    , bySize : PathsBySize -- map files by size so we know what to hash
+    , hashBySize : HashBySize -- map size to set of hash values
+    , hashing : PathSet -- waiting for md5sum to be returned by system
+    , hashed : PathSet -- already hashed
+    , byHash : PathsByHash -- map by hash
+    , selected : Maybe Int -- current size selection
     }
 
 
@@ -66,6 +62,7 @@ emptyModel =
     , bySize = Dict.empty
     , hashBySize = Dict.empty
     , hashing = Set.empty
+    , hashed = Set.empty
     , byHash = Dict.empty
     , selected = Nothing
     }

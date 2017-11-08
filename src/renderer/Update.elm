@@ -19,20 +19,16 @@ update msg model =
 
         -- Clear open folder list and existing results
         SelectSize value ->
-            ( -- move selected files to hashing
-              { model
-                | selected = (toInt value |> Result.toMaybe)
-                , hashing = model.hashing
+            ( { model
+                | selected = toSize value
+                , hashing = filesToHash (toSize value) model
               }
-            , --filesToHash (toInt value) model
-              filesToHash 6 model
+            , filesToHash (toSize value) model
                 |> Set.toList
                 |> List.map (\v -> hashFile v)
                 |> Cmd.batch
             )
 
-        --SelectSize value -> (model, Cmd.none)
-        --}
         -- Add the opened folder to the list
         DirAdded value ->
             ( addFolder value model, Cmd.none )
@@ -44,6 +40,29 @@ update msg model =
 
         HashAdded value ->
             ( updateByHash value model, Cmd.none )
+
+
+toSize : String -> Maybe Int
+toSize str =
+    toInt str |> Result.toMaybe
+
+
+
+-- Decide which files need to be hashed based on the size selected
+
+
+filesToHash : Maybe Int -> Model -> PathSet
+filesToHash value model =
+    case value of
+        Nothing ->
+            Set.empty
+
+        Just size ->
+            Set.diff
+                (Dict.get size model.bySize
+                    |> Maybe.withDefault Set.empty
+                )
+                model.hashed
 
 
 addPath : String -> Maybe PathSet -> Maybe PathSet
@@ -79,6 +98,7 @@ updateByHash data model =
     { model
         | byHash = Dict.update data.hash (addPath data.path) model.byHash
         , hashing = Set.remove data.path model.hashing
+        , hashed = Set.insert data.path model.hashed
     }
 
 
@@ -150,9 +170,3 @@ addFolder dir model =
     { model
         | dirs = parentsFrom (dir :: Set.toList model.dirs) |> Set.fromList
     }
-
-
-filesToHash : Int -> Model -> PathSet
-filesToHash value model =
-    Dict.get value model.bySize
-        |> Maybe.withDefault Set.empty
