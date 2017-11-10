@@ -55,12 +55,20 @@ app.on('ready', function () {
     doIt()
   })
 
+  ipcMain.on('delete-file', (event, arg) => {
+    tasks.push(['delete-file', arg])
+    doIt()
+  })
+
   // messages from the background thread for the UI
   ipcMain.on('add-file', (event, arg) => {
     renderer.webContents.send('add-file', arg)
   })
   ipcMain.on('add-hash', (event, arg) => {
     renderer.webContents.send('add-hash', arg)
+  })
+  ipcMain.on('file-deleted', (event, arg) => {
+    renderer.webContents.send('file-deleted', arg)
   })
 
   // bg thread ready for next task

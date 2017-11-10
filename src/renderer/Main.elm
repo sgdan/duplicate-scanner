@@ -28,4 +28,5 @@ subscriptions model =
         [ addDir DirAdded
         , addFile FileAdded
         , addHash HashAdded
+        , fileDeleted FileDeleted
         ]

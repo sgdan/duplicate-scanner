@@ -19,12 +19,7 @@ view model =
             [ button [ buttonStyle, onClick OpenFolder ] [ text "Open Folder" ]
             , button [ onClick Clear ] [ text "Clear" ]
             ]
-        , div [] [ text ("sizeToPath: " ++ (numFilesChecked model.sizeToPaths)) ]
-        , div [] [ text ("hashToPath: " ++ (toString (Dict.size model.hashToPaths))) ]
-        , div []
-            [ text "Selected: "
-            , text (toString model.selected)
-            ]
+        , div [] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths)) ]
         , br [] []
         , div []
             [ text "Potential duplicates by file size:"
@@ -38,7 +33,6 @@ view model =
 type alias DisplaySet =
     { model : Model
     , paths : StringSet
-    , hashed : Bool
     }
 
 
@@ -54,7 +48,6 @@ toDisplay model =
         List.append hd
             [ { model = model
               , paths = model.hashing
-              , hashed = False
               }
             ]
 
@@ -66,7 +59,6 @@ hashDisplays model selected =
             (\hash ->
                 { model = model
                 , paths = pathsByHash model hash
-                , hashed = True
                 }
             )
 
@@ -102,7 +94,7 @@ resultsTableOrNot model =
             resultsTable size model
 
 
-resultsTable : Int -> Model -> Html msg
+resultsTable : Int -> Model -> Html Msg
 resultsTable size model =
     let
         files =
@@ -115,31 +107,47 @@ resultsTable size model =
             ]
 
 
-pathSetDisplay : DisplaySet -> List (Html msg)
+pathSetDisplay : DisplaySet -> List (Html Msg)
 pathSetDisplay ds =
     let
         pathList =
             Set.toList ds.paths
     in
         div [ divTableRow ]
-            [ div [ divTableCell ] [ text "---" ] ]
-            :: (List.map (\v -> pathRow (ds.hashed) v) pathList)
+            [ div [ defaultStyle ] [ br [] [] ] ]
+            :: (List.map (\v -> pathRow ds.model v) pathList)
 
 
-pathRow : Bool -> String -> Html msg
-pathRow canDelete path =
+canDelete : Model -> String -> Bool
+canDelete model path =
+    Set.member path model.deleted
+        || Set.member path model.hashing
+        |> not
+
+
+pathRow : Model -> String -> Html Msg
+pathRow model path =
     let
-        deleteCell =
-            case canDelete of
-                True ->
-                    button [] [ text "Delete" ]
+        showDelete =
+            canDelete model path
 
-                False ->
-                    text "Hashing..."
+        deleteCell =
+            if showDelete then
+                button [ buttonStyle, onClick (DeleteFile path) ] [ text "Delete" ]
+            else if Set.member path model.hashing then
+                div [ defaultStyle ] [ text "Hashing..." ]
+            else
+                div [ defaultStyle ] [ text "" ]
+
+        cell =
+            if showDelete then
+                divTableCell
+            else
+                deletedTableCell
     in
         div [ divTableRow ]
-            [ div [ divTableCell ] [ deleteCell ]
-            , div [ divTableCell ] [ text path ]
+            [ div [ cell ] [ deleteCell ]
+            , div [ cell ] [ text path ]
             ]
 
 
@@ -266,6 +274,16 @@ divTableCell =
     style
         [ ( "border", "1px solid #999999" )
         , ( "background", "#aaa" )
+        , ( "display", "table-cell" )
+        , ( "padding", "3px 10px" )
+        ]
+
+
+deletedTableCell : Attribute msg
+deletedTableCell =
+    style
+        [ ( "border", "1px solid #999999" )
+        , ( "background", "#faa" )
         , ( "display", "table-cell" )
         , ( "padding", "3px 10px" )
         ]

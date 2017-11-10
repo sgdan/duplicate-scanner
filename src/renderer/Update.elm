@@ -13,6 +13,9 @@ update msg model =
         OpenFolder ->
             ( model, openFolder () )
 
+        DeleteFile path ->
+            ( model, deleteFile path )
+
         -- ask system to open a folder and scan contents
         Clear ->
             ( emptyModel, Cmd.none )
@@ -33,13 +36,20 @@ update msg model =
         DirAdded value ->
             ( addFolder value model, Cmd.none )
 
+        FileDeleted value ->
+            ( markDeleted value model, Cmd.none )
+
         -- Add the file name and size data to the model
         FileAdded value ->
-            --requestHash (findToHash model)
             ( updateBySize value model, Cmd.none )
 
         HashAdded value ->
             ( updateByHash value model, Cmd.none )
+
+
+markDeleted : String -> Model -> Model
+markDeleted path model =
+    { model | deleted = Set.insert path model.deleted }
 
 
 toSize : String -> Maybe Int

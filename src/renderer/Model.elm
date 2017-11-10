@@ -24,6 +24,7 @@ type alias Model =
     , hashToPaths : Dict String StringSet
     , hashing : StringSet -- waiting for md5sum to be returned by system
     , selected : Maybe Int -- current size selection
+    , deleted : StringSet
     }
 
 
@@ -36,6 +37,7 @@ emptyModel =
     , hashToPaths = Dict.empty
     , hashing = Set.empty
     , selected = Nothing
+    , deleted = Set.empty
     }
 
 
@@ -46,3 +48,5 @@ type Msg
     | FileAdded FileInfo
     | HashAdded HashResult
     | SelectSize String
+    | DeleteFile String
+    | FileDeleted String

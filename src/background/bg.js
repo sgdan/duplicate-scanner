@@ -46,9 +46,13 @@ ipcRenderer.on('hash-file', (event, path) => {
 })
 
 ipcRenderer.on('delete-file', (event, path) => {
-    log('request to delete ' + path)
-    ipcRenderer.send('file-deleted', path)
-    ready()
+    fs.unlinkAsync(path).then(() => {
+        ipcRenderer.send('file-deleted', path)
+    }).catch(err => {
+        error(err)
+    }).finally(() => {
+        ready()
+    })
 })
 
 ipcRenderer.on('check-path', (event, path) => {
