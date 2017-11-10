@@ -45,9 +45,9 @@ ipcRenderer.on('hash-file', (event, path) => {
     })
 })
 
-ipcRenderer.on('delete-file', (event, arg) => {
-    log('request to delete ' + arg)
-    //port fileDeleted: (String -> msg) -> Sub msg
+ipcRenderer.on('delete-file', (event, path) => {
+    log('request to delete ' + path)
+    ipcRenderer.send('file-deleted', path)
     ready()
 })
 

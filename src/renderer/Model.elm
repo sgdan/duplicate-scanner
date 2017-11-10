@@ -4,34 +4,38 @@ import Set exposing (Set)
 import Dict exposing (Dict)
 
 
-type alias PathSet =
+type alias FileInfo =
+    { path : String, size : Int }
+
+
+type alias HashResult =
+    { path : String, hash : String }
+
+
+type alias StringSet =
     Set String
-
-
-type alias HashSet =
-    Set String
-
-
-type alias PathsBySize =
-    Dict Int PathSet
-
-
-type alias PathsByHash =
-    Dict String PathSet
-
-
-type alias HashBySize =
-    Dict Int HashSet
 
 
 type alias Model =
-    { dirs : PathSet -- names of the root folders we've scanned
-    , bySize : PathsBySize -- map files by size so we know what to hash
-    , hashBySize : HashBySize -- map size to set of hash values
-    , hashing : PathSet -- waiting for md5sum to be returned by system
-    , hashed : PathSet -- already hashed
-    , byHash : PathsByHash -- map by hash
+    { dirs : StringSet -- names of the root folders we've scanned
+    , sizeToPaths : Dict Int StringSet
+    , pathToSize : Dict String Int
+    , sizeToHashes : Dict Int StringSet
+    , hashToPaths : Dict String StringSet
+    , hashing : StringSet -- waiting for md5sum to be returned by system
     , selected : Maybe Int -- current size selection
+    }
+
+
+emptyModel : Model
+emptyModel =
+    { dirs = Set.empty
+    , sizeToPaths = Dict.empty
+    , pathToSize = Dict.empty
+    , sizeToHashes = Dict.empty
+    , hashToPaths = Dict.empty
+    , hashing = Set.empty
+    , selected = Nothing
     }
 
 
@@ -40,29 +44,5 @@ type Msg
     | Clear
     | DirAdded String
     | FileAdded FileInfo
-    | HashAdded FileHash
+    | HashAdded HashResult
     | SelectSize String
-
-
-type alias FileInfo =
-    { path : String
-    , size : Int
-    }
-
-
-type alias FileHash =
-    { path : String
-    , hash : String
-    }
-
-
-emptyModel : Model
-emptyModel =
-    { dirs = Set.empty
-    , bySize = Dict.empty
-    , hashBySize = Dict.empty
-    , hashing = Set.empty
-    , hashed = Set.empty
-    , byHash = Dict.empty
-    , selected = Nothing
-    }

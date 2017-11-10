@@ -51,7 +51,7 @@ toSize str =
 -- Decide which files need to be hashed based on the size selected
 
 
-filesToHash : Maybe Int -> Model -> PathSet
+filesToHash : Maybe Int -> Model -> StringSet
 filesToHash value model =
     case value of
         Nothing ->
@@ -59,20 +59,20 @@ filesToHash value model =
 
         Just size ->
             Set.diff
-                (Dict.get size model.bySize
+                (Dict.get size model.sizeToPaths
                     |> Maybe.withDefault Set.empty
                 )
-                model.hashed
-
-
-addPath : String -> Maybe PathSet -> Maybe PathSet
+                (hashed
+                    model
+                )
 
 
 
 -- Add path to existing set, or create new set if no existing
 
 
-addPath new existing =
+addString : String -> Maybe StringSet -> Maybe StringSet
+addString new existing =
     Just <|
         case existing of
             Just existing ->
@@ -89,17 +89,23 @@ addPath new existing =
 updateBySize : FileInfo -> Model -> Model
 updateBySize info model =
     { model
-        | bySize = Dict.update info.size (addPath info.path) model.bySize
+        | sizeToPaths = Dict.update info.size (addString info.path) model.sizeToPaths
+        , pathToSize = Dict.insert info.path info.size model.pathToSize
     }
 
 
-updateByHash : FileHash -> Model -> Model
+updateByHash : HashResult -> Model -> Model
 updateByHash data model =
     { model
-        | byHash = Dict.update data.hash (addPath data.path) model.byHash
+        | hashToPaths = Dict.update data.hash (addString data.path) model.hashToPaths
         , hashing = Set.remove data.path model.hashing
-        , hashed = Set.insert data.path model.hashed
+        , sizeToHashes = Dict.update (sizeOf data.path model) (addString data.hash) model.sizeToHashes
     }
+
+
+sizeOf : String -> Model -> Int
+sizeOf path model =
+    Dict.get path model.pathToSize |> Maybe.withDefault 0
 
 
 
@@ -107,7 +113,7 @@ updateByHash data model =
 -- paths we're requesting hash for are added to the "hashing" set
 
 
-requestHash : PathSet -> Model -> ( Model, Cmd Msg )
+requestHash : StringSet -> Model -> ( Model, Cmd Msg )
 requestHash paths model =
     if Set.isEmpty paths then
         ( model, Cmd.none )
@@ -121,13 +127,13 @@ requestHash paths model =
 -- this means possible duplicates minus already hashed, minus hashing
 
 
-findToHash : Model -> PathSet
+findToHash : Model -> StringSet
 findToHash model =
     Set.diff (possibleDuplicates model) <|
         Set.union (hashed model) model.hashing
 
 
-possibleDuplicates : Model -> PathSet
+possibleDuplicates : Model -> StringSet
 possibleDuplicates model =
     Dict.foldl
         (\k v acc ->
@@ -137,17 +143,17 @@ possibleDuplicates model =
                 acc
         )
         Set.empty
-        model.bySize
+        model.sizeToPaths
 
 
-hashed : Model -> PathSet
+hashed : Model -> StringSet
 hashed model =
     Dict.foldl
         (\k v acc ->
             Set.union acc v
         )
         Set.empty
-        model.byHash
+        model.hashToPaths
 
 
 isChild : String -> String -> Bool
@@ -169,4 +175,5 @@ addFolder : String -> Model -> Model
 addFolder dir model =
     { model
         | dirs = parentsFrom (dir :: Set.toList model.dirs) |> Set.fromList
+        , selected = Nothing
     }

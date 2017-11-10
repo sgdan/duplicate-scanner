@@ -19,9 +19,8 @@ view model =
             [ button [ buttonStyle, onClick OpenFolder ] [ text "Open Folder" ]
             , button [ onClick Clear ] [ text "Clear" ]
             ]
-        , div [] [ text ("Number of files checked: " ++ (numFilesChecked model.bySize)) ]
-        , div [] [ text ("Hashing: " ++ (toString (model.hashing))) ]
-        , div [] [ text ("byHash: " ++ (toString (Dict.size model.byHash))) ]
+        , div [] [ text ("sizeToPath: " ++ (numFilesChecked model.sizeToPaths)) ]
+        , div [] [ text ("hashToPath: " ++ (toString (Dict.size model.hashToPaths))) ]
         , div []
             [ text "Selected: "
             , text (toString model.selected)
@@ -29,15 +28,119 @@ view model =
         , br [] []
         , div []
             [ text "Potential duplicates by file size:"
-            , select [ selectStyle, onChange SelectSize ] <| sizesList <| sameSize model
+            , select [ selectStyle, onChange SelectSize ] <| sizesList model <| sameSize model
             ]
         , br [] []
-        , div []
-            [ div [] [ text "Hashing..." ]
-            , div [] [ text "Group 1" ]
-            , div [] [ text "Group 2" ]
-            ]
+        , resultsTableOrNot model
         ]
+
+
+type alias DisplaySet =
+    { model : Model
+    , paths : StringSet
+    , hashed : Bool
+    }
+
+
+toDisplay : Model -> List DisplaySet
+toDisplay model =
+    let
+        hashes =
+            selectedHashes model
+
+        hd =
+            hashDisplays model hashes
+    in
+        List.append hd
+            [ { model = model
+              , paths = model.hashing
+              , hashed = False
+              }
+            ]
+
+
+hashDisplays : Model -> StringSet -> List DisplaySet
+hashDisplays model selected =
+    (Set.toList selected)
+        |> List.map
+            (\hash ->
+                { model = model
+                , paths = pathsByHash model hash
+                , hashed = True
+                }
+            )
+
+
+pathsByHash : Model -> String -> StringSet
+pathsByHash model hash =
+    case (Dict.get hash model.hashToPaths) of
+        Nothing ->
+            Set.empty
+
+        Just paths ->
+            paths
+
+
+selectedHashes : Model -> StringSet
+selectedHashes model =
+    case model.selected of
+        Nothing ->
+            Set.empty
+
+        Just size ->
+            Dict.get size model.sizeToHashes
+                |> Maybe.withDefault Set.empty
+
+
+resultsTableOrNot : Model -> Html Msg
+resultsTableOrNot model =
+    case model.selected of
+        Nothing ->
+            text "Nothing selected"
+
+        Just size ->
+            resultsTable size model
+
+
+resultsTable : Int -> Model -> Html msg
+resultsTable size model =
+    let
+        files =
+            List.foldl (\v acc -> List.append acc (pathSetDisplay v)) [] <|
+                toDisplay model
+    in
+        div [ divTable ]
+            [ div [ divTableBody ]
+                files
+            ]
+
+
+pathSetDisplay : DisplaySet -> List (Html msg)
+pathSetDisplay ds =
+    let
+        pathList =
+            Set.toList ds.paths
+    in
+        div [ divTableRow ]
+            [ div [ divTableCell ] [ text "---" ] ]
+            :: (List.map (\v -> pathRow (ds.hashed) v) pathList)
+
+
+pathRow : Bool -> String -> Html msg
+pathRow canDelete path =
+    let
+        deleteCell =
+            case canDelete of
+                True ->
+                    button [] [ text "Delete" ]
+
+                False ->
+                    text "Hashing..."
+    in
+        div [ divTableRow ]
+            [ div [ divTableCell ] [ deleteCell ]
+            , div [ divTableCell ] [ text path ]
+            ]
 
 
 formatSize : Int -> String
@@ -52,19 +155,29 @@ formatSize k =
         toString k ++ " B"
 
 
-sizeOption : Int -> Int -> Html msg
-sizeOption bytes n =
-    option [ toString bytes |> value ]
+sizeOption : Int -> Int -> Bool -> Html msg
+sizeOption bytes n isSelected =
+    option [ toString bytes |> value, selected isSelected ]
         [ toString n ++ " files of size " ++ formatSize bytes |> text ]
 
 
-sizesList : Dict Int PathSet -> List (Html msg)
-sizesList entries =
+wasSelected : Int -> Model -> Bool
+wasSelected size model =
+    case model.selected of
+        Nothing ->
+            False
+
+        Just val ->
+            val == size
+
+
+sizesList : Model -> Dict Int StringSet -> List (Html msg)
+sizesList model entries =
     -- first item blank
     option [ value "" ] [ text "" ]
         :: (Dict.foldl
                 (\k v acc ->
-                    sizeOption k (Set.size v)
+                    sizeOption k (Set.size v) (wasSelected k model)
                         :: acc
                 )
                 []
@@ -94,7 +207,7 @@ onChange value =
 -- Count the number of non-empty files checked so far
 
 
-numFilesChecked : Dict Int PathSet -> String
+numFilesChecked : Dict Int StringSet -> String
 numFilesChecked bySize =
     Dict.foldl (\k v acc -> acc + (Set.size v)) 0 bySize
         |> toString
@@ -107,9 +220,9 @@ numFilesChecked bySize =
 --}
 
 
-sameSize : Model -> Dict Int PathSet
+sameSize : Model -> Dict Int StringSet
 sameSize model =
-    Dict.filter (\k v -> (Set.size v) > 1) model.bySize
+    Dict.filter (\k v -> (Set.size v) > 1) model.sizeToPaths
 
 
 defaultStyle : Attribute msg
@@ -135,4 +248,31 @@ selectStyle =
     style
         [ ( "border", "1" )
         , ( "width", "100%" )
+        ]
+
+
+divTable : Attribute msg
+divTable =
+    style [ ( "display", "table" ), ( "width", "100%" ) ]
+
+
+divTableRow : Attribute msg
+divTableRow =
+    style [ ( "display", "table-row" ) ]
+
+
+divTableCell : Attribute msg
+divTableCell =
+    style
+        [ ( "border", "1px solid #999999" )
+        , ( "background", "#aaa" )
+        , ( "display", "table-cell" )
+        , ( "padding", "3px 10px" )
+        ]
+
+
+divTableBody : Attribute msg
+divTableBody =
+    style
+        [ ( "display", "table-row-group" )
         ]

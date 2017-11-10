@@ -30,8 +30,7 @@ yarn dev
 
 # TODO
 
-- Compute md5sum hash values for files of the same size to see if they're duplicates
-- Display duplicate file groups in the UI
+- Clean up UI!
 - Provide delete option in the UI so duplicate files can be removed
 - Package into executable format
 - List by update date as well as size? sort in UI?

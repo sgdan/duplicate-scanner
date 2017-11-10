@@ -25,7 +25,7 @@ port addDir : (String -> msg) -> Sub msg
 port addFile : (FileInfo -> msg) -> Sub msg
 
 
-port addHash : (FileHash -> msg) -> Sub msg
+port addHash : (HashResult -> msg) -> Sub msg
 
 
 port fileDeleted : (String -> msg) -> Sub msg
