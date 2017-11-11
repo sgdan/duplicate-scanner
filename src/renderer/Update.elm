@@ -13,6 +13,9 @@ update msg model =
         OpenFolder ->
             ( model, openFolder () )
 
+        Close ->
+            ( model, close () )
+
         DeleteFile path ->
             ( model, deleteFile path )
 

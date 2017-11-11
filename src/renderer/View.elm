@@ -14,16 +14,51 @@ import Json.Decode as Json
 view : Model -> Html Msg
 view model =
     div []
-        [ Set.toList model.dirs |> folderList
-        , fieldset [ defaultStyle ]
-            [ button [ buttonStyle, onClick OpenFolder ] [ text "Open Folder" ]
+        [ div [ class "left-margin" ] []
+        , div [ class "left-back" ]
+            [ button [] [ text "Back" ]
+            , button [ onClick Close ] [ text "Close" ]
+            ]
+        , div [ class "right-buttons" ]
+            [ button [ onClick OpenFolder ] [ text "Open" ]
             , button [ onClick Clear ] [ text "Clear" ]
             ]
+        , div [ class "app-header" ]
+            [ h1 [] [ text "Duplicates" ]
+            ]
+        , div [ class "folders" ]
+            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Select" ] ]
+            , div [ class "fileIcon" ] [ br [] [], text "FOLDER" ]
+            , div [ class "fileName" ]
+                [ span [ class "fileNameText" ] [ text "Folder Name" ]
+                ]
+            , div [ class "filePath" ] [ text "C:\\one\\two\\three\\four" ]
+            ]
+        , div [ class "checked" ]
+            [ span [ class "alignBottom" ] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths) ++ " files") ]
+            ]
+        , div [ class "content" ]
+            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Delete" ] ]
+            , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
+            , div [ class "fileName" ]
+                [ span [ class "fileNameText" ] [ text "File Name" ]
+                ]
+            , div [ class "filePath" ] [ text "C:\\six\\five\\four\\three\\two\\one" ]
+            ]
+
+        {--
+
+
+
+
+--}
+        -- old
+        , Set.toList model.dirs |> folderList
         , div [] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths)) ]
         , br [] []
         , div []
             [ text "Potential duplicates by file size:"
-            , select [ selectStyle, onChange SelectSize ] <| sizesList model <| sameSize model
+            , select [ onChange SelectSize ] <| sizesList model <| sameSize model
             ]
         , br [] []
         , resultsTableOrNot model
@@ -101,8 +136,8 @@ resultsTable size model =
             List.foldl (\v acc -> List.append acc (pathSetDisplay v)) [] <|
                 toDisplay model
     in
-        div [ divTable ]
-            [ div [ divTableBody ]
+        div [ class "divTable" ]
+            [ div [ class "divTableBody" ]
                 files
             ]
 
@@ -113,8 +148,8 @@ pathSetDisplay ds =
         pathList =
             Set.toList ds.paths
     in
-        div [ divTableRow ]
-            [ div [ defaultStyle ] [ br [] [] ] ]
+        div [ class "divTableRow" ]
+            [ div [] [ br [] [] ] ]
             :: (List.map (\v -> pathRow ds.model v) pathList)
 
 
@@ -133,19 +168,19 @@ pathRow model path =
 
         deleteCell =
             if showDelete then
-                button [ buttonStyle, onClick (DeleteFile path) ] [ text "Delete" ]
+                button [ onClick (DeleteFile path) ] [ text "Delete" ]
             else if Set.member path model.hashing then
-                div [ defaultStyle ] [ text "Hashing..." ]
+                div [] [ text "Hashing..." ]
             else
-                div [ defaultStyle ] [ text "" ]
+                div [] [ text "" ]
 
         cell =
             if showDelete then
-                divTableCell
+                class "normal-cell"
             else
-                deletedTableCell
+                class "deleted-cell"
     in
-        div [ divTableRow ]
+        div [ class "divTableRow" ]
             [ div [ cell ] [ deleteCell ]
             , div [ cell ] [ text path ]
             ]
@@ -231,66 +266,3 @@ numFilesChecked bySize =
 sameSize : Model -> Dict Int StringSet
 sameSize model =
     Dict.filter (\k v -> (Set.size v) > 1) model.sizeToPaths
-
-
-defaultStyle : Attribute msg
-defaultStyle =
-    style
-        [ ( "width", "100%" )
-        , ( "height", "40px" )
-        , ( "padding", "10px" )
-        , ( "font-size", "1em" )
-        , ( "border", "0" )
-        ]
-
-
-buttonStyle : Attribute msg
-buttonStyle =
-    style
-        [ ( "margin", "10px" )
-        ]
-
-
-selectStyle : Attribute msg
-selectStyle =
-    style
-        [ ( "border", "1" )
-        , ( "width", "100%" )
-        ]
-
-
-divTable : Attribute msg
-divTable =
-    style [ ( "display", "table" ), ( "width", "100%" ) ]
-
-
-divTableRow : Attribute msg
-divTableRow =
-    style [ ( "display", "table-row" ) ]
-
-
-divTableCell : Attribute msg
-divTableCell =
-    style
-        [ ( "border", "1px solid #999999" )
-        , ( "background", "#aaa" )
-        , ( "display", "table-cell" )
-        , ( "padding", "3px 10px" )
-        ]
-
-
-deletedTableCell : Attribute msg
-deletedTableCell =
-    style
-        [ ( "border", "1px solid #999999" )
-        , ( "background", "#faa" )
-        , ( "display", "table-cell" )
-        , ( "padding", "3px 10px" )
-        ]
-
-
-divTableBody : Attribute msg
-divTableBody =
-    style
-        [ ( "display", "table-row-group" )
-        ]

@@ -1,10 +1,12 @@
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     background-color: black;
     font-family: Arial, Helvetica, Verdana, Geneva, Tahoma, sans-serif;
     color: #444444;
     font-size: 12px;
+    overflow: hidden;
 }
 
 h1 {
@@ -22,19 +24,20 @@ button {
     width: 600px;
     height: 600px;
     margin: auto;
-    background: #ccc;
+    background-image: url(images/background.jpg);
 }
 
 .left-margin {
-    background: brown; 
     float: left;
     width: 10%;
     height: 100%;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
 }
 
 .left-back {
     float: left;
-    width: 10%;
+    width: 20%;
     height: 10%;
 }
 
@@ -68,49 +71,29 @@ button {
     overflow-y: auto;
 }
 
-.folderIcon {
-    width: 20%;
-    height: 40%;
-    text-align: center;
-}
-
-.folderName {
-    display: flex;
-    width: 80%;
-    height: 20%;
-    float: right;
-    font-size: 18;
-}
-
-.folderNameText {
-    align-self: flex-end;
-}
-
-.folderPath {
-    width: 80%;
-    height: 20%;
-    float: right;
-}
-
 .fileIcon {
     float: left;
-    width: 15%;
-    height: 15%;
+    width: 90px;
+    height: 45px;
     text-align: center;
 }
+
 .fileAction {
     float: right;
-    width: 15%;
-    height: 15%;
+    width: 90px;
+    height: 45px;
 }
+
 .fileName {
     display: flex;
     font-size: 18;
-    height: 10%;
+    height: 30px;
 }
+
 .fileNameText {
     align-self: flex-end;
 }
+
 .filePath {
-    height: 5%;
+    height: 15px;
 }

@@ -22,7 +22,9 @@ function doIt() {
 
 app.on('ready', function () {
   // Create the "renderer" window which contains the visible UI
-  renderer = new BrowserWindow({ "width": 900, "height": 768 })
+  renderer = new BrowserWindow({ width: 1200, height: 600, frame: false })
+  renderer.setMenu(null)
+  //renderer.setResizable(false)
   renderer.loadURL(`file://${__dirname}/src/renderer/index.html`)
   renderer.webContents.openDevTools()
   renderer.on('closed', function () {
@@ -31,10 +33,14 @@ app.on('ready', function () {
 
   // create a background thread for each cpu
   for (let i = 0; i < cpus; i++) {
-    let bg = new BrowserWindow({ "show": false })
+    let bg = new BrowserWindow({ show: false })
     bg.loadURL(`file://${__dirname}/src/background/bg.html`)
     //bg.webContents.openDevTools()
   }
+
+  ipcMain.on('close-app', (event, arg) => {
+    app.quit()
+  })
 
   // check if the path is a file or folder
   ipcMain.on('check-path', (event, arg) => {

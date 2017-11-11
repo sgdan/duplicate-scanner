@@ -50,3 +50,4 @@ type Msg
     | SelectSize String
     | DeleteFile String
     | FileDeleted String
+    | Close

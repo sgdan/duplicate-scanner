@@ -9,6 +9,9 @@ import Model exposing (..)
 port openFolder : () -> Cmd msg
 
 
+port close : () -> Cmd msg
+
+
 port hashFile : String -> Cmd msg
 
 

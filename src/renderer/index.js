@@ -18,6 +18,10 @@ elmApp.ports.openFolder.subscribe(() => {
     )
 })
 
+elmApp.ports.close.subscribe(() => {
+    ipcRenderer.send('close-app')
+})
+
 elmApp.ports.hashFile.subscribe(file => {
     ipcRenderer.send('hash-file', file)
 })
