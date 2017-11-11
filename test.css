@@ -1,0 +1,116 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    font-family: Arial, Helvetica, Verdana, Geneva, Tahoma, sans-serif;
+    color: #444444;
+    font-size: 12px;
+}
+
+h1 {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    padding: 5px;
+    margin: 5px;
+}
+
+.app-container {
+    width: 600px;
+    height: 600px;
+    margin: auto;
+    background: #ccc;
+}
+
+.left-margin {
+    background: brown; 
+    float: left;
+    width: 10%;
+    height: 100%;
+}
+
+.left-back {
+    float: left;
+    width: 10%;
+    height: 10%;
+}
+
+.right-buttons {
+    float: right;
+    width: 20%;
+    height: 10%;
+}
+
+.app-header {
+    height: 10%;
+}
+
+.checked {
+    height: 5%;
+    display: flex;
+}
+
+.alignBottom {
+    align-self: flex-end;
+    padding: 5px;
+}
+
+.folders {
+    height: 25%;
+    overflow-y: auto;
+}
+
+.content {
+    height: 60%;
+    overflow-y: auto;
+}
+
+.folderIcon {
+    width: 20%;
+    height: 40%;
+    text-align: center;
+}
+
+.folderName {
+    display: flex;
+    width: 80%;
+    height: 20%;
+    float: right;
+    font-size: 18;
+}
+
+.folderNameText {
+    align-self: flex-end;
+}
+
+.folderPath {
+    width: 80%;
+    height: 20%;
+    float: right;
+}
+
+.fileIcon {
+    float: left;
+    width: 15%;
+    height: 15%;
+    text-align: center;
+}
+.fileAction {
+    float: right;
+    width: 15%;
+    height: 15%;
+}
+.fileName {
+    display: flex;
+    font-size: 18;
+    height: 10%;
+}
+.fileNameText {
+    align-self: flex-end;
+}
+.filePath {
+    height: 5%;
+}
