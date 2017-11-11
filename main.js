@@ -1,7 +1,7 @@
 'use strict';
 
 const { ipcMain, BrowserWindow, app } = require('electron')
-const cpus = 3 //require('os').cpus().length
+const cpus = require('os').cpus().length
 
 // stack of available background threads
 let available = []
