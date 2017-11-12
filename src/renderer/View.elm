@@ -9,6 +9,7 @@ import Set exposing (Set)
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
 import Path.Generic as Path
+import Array exposing (Array)
 
 
 view : Model -> Html Msg
@@ -169,8 +170,8 @@ displaySetAction model path =
         button [ onClick (DeleteFile path) ] [ text "Delete" ]
 
 
-displaySetEntry : Model -> String -> List (Html Msg)
-displaySetEntry model path =
+displaySetEntry : Model -> String -> String -> List (Html Msg)
+displaySetEntry model path style =
     let
         plat =
             platform model
@@ -184,7 +185,7 @@ displaySetEntry model path =
         [ div [ class "fileAction" ]
             [ (displaySetAction model path)
             ]
-        , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
+        , div [ class ("fileIcon " ++ style) ] [ br [] [], text "FILE" ]
         , div [ class "fileName" ]
             [ span [ class "fileNameText" ] [ text name ]
             ]
@@ -192,11 +193,35 @@ displaySetEntry model path =
         ]
 
 
+displaySetEntries : Model -> List (Maybe String) -> String -> List (Html Msg)
+displaySetEntries model paths style =
+    List.filterMap identity paths
+        |> List.foldl (\v acc -> List.append (displaySetEntry model v style) acc) []
+
+
 displaySet : DisplaySet -> List (Html Msg)
 displaySet dset =
-    dset.paths
-        |> Set.toList
-        |> List.foldl (\v acc -> List.append (displaySetEntry dset.model v) acc) []
+    let
+        paths =
+            Set.toList dset.paths |> Array.fromList
+
+        n =
+            Array.length paths
+
+        first =
+            Array.get 0 paths
+
+        middle =
+            Array.slice 1 -1 paths
+                |> Array.toList
+                |> List.map (\v -> Just v)
+    in
+        if n == 1 then
+            displaySetEntries dset.model [ first ] "onlyIcon"
+        else
+            displaySetEntries dset.model [ first ] "firstIcon"
+                ++ displaySetEntries dset.model middle "middleIcon"
+                ++ displaySetEntries dset.model [ Array.get (n - 1) paths ] "lastIcon"
 
 
 displaySets : Model -> List (Html Msg)

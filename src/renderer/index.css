@@ -83,6 +83,22 @@ button {
     text-align: center;
 }
 
+.onlyIcon {
+    background: url(images/only-icon-bg.png)
+}
+
+.firstIcon {
+    background: url(images/first-icon-bg.png)
+}
+
+.middleIcon {
+    background: url(images/middle-icon-bg.png)
+}
+
+.lastIcon {
+    background: url(images/last-icon-bg.png)
+}
+
 .fileAction {
     float: right;
     width: 90px;
