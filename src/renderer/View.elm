@@ -8,7 +8,6 @@ import Dict exposing (Dict)
 import Set exposing (Set)
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Json.Decode as Json
 import Path.Generic as Path
 
 
@@ -40,15 +39,49 @@ folderPage model =
         , div [ class "checked" ]
             [ span [ class "alignBottom" ] [ checked model ]
             ]
-        , div [ class "content" ]
-            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Delete" ] ]
-            , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
-            , div [ class "fileName" ]
-                [ span [ class "fileNameText" ] [ text "File Name" ]
-                ]
-            , div [ class "filePath" ] [ text "C:\\six\\five\\four\\three\\two\\one" ]
-            ]
+        , div [ class "content" ] (fileSets model)
         ]
+
+
+sameSize : Model -> Dict Int StringSet
+sameSize model =
+    -- filter out groups of files that are the same size
+    Dict.filter (\k v -> (Set.size v) > 1) model.sizeToPaths
+
+
+sameSizeEntry : Int -> Int -> List (Html Msg)
+sameSizeEntry sizeInBytes numFiles =
+    let
+        sizeDesc =
+            formatSize sizeInBytes
+
+        countDesc =
+            (toString numFiles) ++ " files"
+    in
+        [ div [ class "fileAction" ]
+            [ button [ onClick <| SelectSize sizeInBytes ] [ text "Select" ]
+            ]
+        , div [ class "fileIcon" ] [ br [] [], text "FILESET" ]
+        , div [ class "fileName" ]
+            [ span [ class "fileNameText" ] [ text sizeDesc ]
+            ]
+        , div [ class "filePath" ] [ text countDesc ]
+        ]
+
+
+appendEntry : Int -> StringSet -> List (Html Msg) -> List (Html Msg)
+appendEntry size paths entries =
+    let
+        entry =
+            sameSizeEntry size <| Set.size paths
+    in
+        List.append entry entries
+
+
+fileSets : Model -> List (Html Msg)
+fileSets model =
+    sameSize model
+        |> Dict.foldl appendEntry []
 
 
 checked : Model -> Html msg
@@ -103,28 +136,16 @@ filePage model =
     div []
         [ div [ class "left-margin" ] []
         , div [ class "left-back" ]
-            [ button [] [ text "Back" ]
+            [ button [ onClick Back ] [ text "Back" ]
             , button [ onClick Close ] [ text "Close" ]
             ]
         , div [ class "right-buttons" ]
-            [ button [ onClick OpenFolder ] [ text "Open" ]
-            , button [ onClick Clear ] [ text "Clear" ]
+            [ button [ onClick OpenFolder ] [ text "Safe" ]
             ]
         , div [ class "app-header" ]
             [ h1 [] [ text "Duplicates FilePage" ]
             ]
-        , div [ class "folders" ]
-            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Select" ] ]
-            , div [ class "fileIcon" ] [ br [] [], text "FOLDER" ]
-            , div [ class "fileName" ]
-                [ span [ class "fileNameText" ] [ text "Folder Name" ]
-                ]
-            , div [ class "filePath" ] [ text "C:\\one\\two\\three\\four" ]
-            ]
-        , div [ class "checked" ]
-            [ span [ class "alignBottom" ] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths) ++ " files") ]
-            ]
-        , div [ class "content" ]
+        , div [ class "files" ]
             [ div [ class "fileAction" ] [ br [] [], button [] [ text "Delete" ] ]
             , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
             , div [ class "fileName" ]
@@ -132,23 +153,6 @@ filePage model =
                 ]
             , div [ class "filePath" ] [ text "C:\\six\\five\\four\\three\\two\\one" ]
             ]
-
-        {--
-
-
-
-
---}
-        -- old
-        --, Set.toList model.dirs |> folderList
-        , div [] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths)) ]
-        , br [] []
-        , div []
-            [ text "Potential duplicates by file size:"
-            , select [ onChange SelectSize ] <| sizesList model <| sameSize model
-            ]
-        , br [] []
-        , resultsTableOrNot model
         ]
 
 
@@ -204,16 +208,6 @@ selectedHashes model =
         Just size ->
             Dict.get size model.sizeToHashes
                 |> Maybe.withDefault Set.empty
-
-
-resultsTableOrNot : Model -> Html Msg
-resultsTableOrNot model =
-    case model.selected of
-        Nothing ->
-            text "Nothing selected"
-
-        Just size ->
-            resultsTable size model
 
 
 resultsTable : Int -> Model -> Html Msg
@@ -285,58 +279,8 @@ formatSize k =
         toString k ++ " B"
 
 
-sizeOption : Int -> Int -> Bool -> Html msg
-sizeOption bytes n isSelected =
-    option [ toString bytes |> value, selected isSelected ]
-        [ toString n ++ " files of size " ++ formatSize bytes |> text ]
-
-
-wasSelected : Int -> Model -> Bool
-wasSelected size model =
-    case model.selected of
-        Nothing ->
-            False
-
-        Just val ->
-            val == size
-
-
-sizesList : Model -> Dict Int StringSet -> List (Html msg)
-sizesList model entries =
-    -- first item blank
-    option [ value "" ] [ text "" ]
-        :: (Dict.foldl
-                (\k v acc ->
-                    sizeOption k (Set.size v) (wasSelected k model)
-                        :: acc
-                )
-                []
-                entries
-           )
-
-
-onChange : (String -> msg) -> Attribute msg
-onChange value =
-    on "change" (Json.map value targetValue)
-
-
-
--- Count the number of non-empty files checked so far
-
-
 numFilesChecked : Dict Int StringSet -> String
 numFilesChecked bySize =
+    -- count the non-empty files checked so far
     Dict.foldl (\k v acc -> acc + (Set.size v)) 0 bySize
         |> toString
-
-
-
-{--
-   Return only entries where there's more than one file. We only want to
-   compute hash values for files that are the same size.
---}
-
-
-sameSize : Model -> Dict Int StringSet
-sameSize model =
-    Dict.filter (\k v -> (Set.size v) > 1) model.sizeToPaths

@@ -24,16 +24,12 @@ update msg model =
             ( emptyModel model.isWindows, Cmd.none )
 
         -- Clear open folder list and existing results
-        SelectSize value ->
-            ( { model
-                | selected = toSize value
-                , hashing = filesToHash (toSize value) model
-              }
-            , filesToHash (toSize value) model
-                |> Set.toList
-                |> List.map (\v -> hashFile v)
-                |> Cmd.batch
-            )
+        SelectSize sizeInBytes ->
+            processSizeSelection sizeInBytes model
+
+        -- clear size selection to go back to folder page
+        Back ->
+            ( { model | selected = Nothing }, Cmd.none )
 
         -- Add the opened folder to the list
         DirAdded value ->
@@ -50,34 +46,41 @@ update msg model =
             ( updateByHash value model, Cmd.none )
 
 
+processSizeSelection : Int -> Model -> ( Model, Cmd Msg )
+processSizeSelection sizeInBytes model =
+    let
+        toHash =
+            filesToHash sizeInBytes model
+    in
+        ( { model
+            | selected = Just sizeInBytes
+            , hashing = toHash
+          }
+        , toHash
+            |> Set.toList
+            |> List.map (\v -> hashFile v)
+            |> Cmd.batch
+        )
+
+
 markDeleted : String -> Model -> Model
 markDeleted path model =
     { model | deleted = Set.insert path model.deleted }
-
-
-toSize : String -> Maybe Int
-toSize str =
-    toInt str |> Result.toMaybe
 
 
 
 -- Decide which files need to be hashed based on the size selected
 
 
-filesToHash : Maybe Int -> Model -> StringSet
-filesToHash value model =
-    case value of
-        Nothing ->
-            Set.empty
-
-        Just size ->
-            Set.diff
-                (Dict.get size model.sizeToPaths
-                    |> Maybe.withDefault Set.empty
-                )
-                (hashed
-                    model
-                )
+filesToHash : Int -> Model -> StringSet
+filesToHash size model =
+    Set.diff
+        (Dict.get size model.sizeToPaths
+            |> Maybe.withDefault Set.empty
+        )
+        (hashed
+            model
+        )
 
 
 

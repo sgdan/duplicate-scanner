@@ -49,7 +49,8 @@ type Msg
     | DirAdded String
     | FileAdded FileInfo
     | HashAdded HashResult
-    | SelectSize String
+    | SelectSize Int
+    | Back
     | DeleteFile String
     | FileDeleted String
     | Close
