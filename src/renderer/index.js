@@ -1,9 +1,13 @@
 'use strict';
 
 const { ipcRenderer } = require('electron')
+const os = require('os')
+
 let Elm = require('./Main')
 let container = document.getElementById('container')
-let elmApp = Elm.Main.embed(container)
+let elmApp = Elm.Main.embed(container, {
+    isWindows: os.platform() == 'win32'
+})
 let dialog = require('electron').remote.dialog
 
 // open the folder, send info of files within

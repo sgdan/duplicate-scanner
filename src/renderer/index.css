@@ -71,6 +71,11 @@ button {
     overflow-y: auto;
 }
 
+.files {
+    height: 90%;
+    overflow-y: auto;
+}
+
 .fileIcon {
     float: left;
     width: 90px;

@@ -21,7 +21,7 @@ update msg model =
 
         -- ask system to open a folder and scan contents
         Clear ->
-            ( emptyModel, Cmd.none )
+            ( emptyModel model.isWindows, Cmd.none )
 
         -- Clear open folder list and existing results
         SelectSize value ->

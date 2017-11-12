@@ -9,10 +9,97 @@ import Set exposing (Set)
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
 import Json.Decode as Json
+import Path.Generic as Path
 
 
 view : Model -> Html Msg
 view model =
+    case model.selected of
+        Nothing ->
+            folderPage model
+
+        Just size ->
+            filePage model
+
+
+folderPage : Model -> Html Msg
+folderPage model =
+    div []
+        [ div [ class "left-margin" ] []
+        , div [ class "left-back" ]
+            [ button [ onClick Close ] [ text "Close" ]
+            ]
+        , div [ class "right-buttons" ]
+            [ button [ onClick OpenFolder ] [ text "Open" ]
+            , button [ onClick Clear ] [ text "Clear" ]
+            ]
+        , div [ class "app-header" ]
+            [ h1 [] [ text "Duplicates" ]
+            ]
+        , div [ class "folders" ] (folderList model)
+        , div [ class "checked" ]
+            [ span [ class "alignBottom" ] [ checked model ]
+            ]
+        , div [ class "content" ]
+            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Delete" ] ]
+            , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
+            , div [ class "fileName" ]
+                [ span [ class "fileNameText" ] [ text "File Name" ]
+                ]
+            , div [ class "filePath" ] [ text "C:\\six\\five\\four\\three\\two\\one" ]
+            ]
+        ]
+
+
+checked : Model -> Html msg
+checked model =
+    let
+        count =
+            numFilesChecked model.sizeToPaths
+    in
+        if count == "0" then
+            text ""
+        else
+            text <| "Checked " ++ count ++ " files"
+
+
+platform : Model -> Path.Platform
+platform model =
+    if model.isWindows then
+        Path.Windows
+    else
+        Path.Posix
+
+
+folder : Model -> String -> List (Html msg)
+folder model path =
+    let
+        plat =
+            platform model
+
+        name =
+            Path.takeFileName plat path
+
+        dir =
+            Path.takeDirectory plat path
+    in
+        [ div [ class "fileAction" ] []
+        , div [ class "fileIcon" ] [ br [] [], text "FOLDER" ]
+        , div [ class "fileName" ]
+            [ span [ class "fileNameText" ] [ text name ]
+            ]
+        , div [ class "filePath" ] [ text dir ]
+        ]
+
+
+folderList : Model -> List (Html msg)
+folderList model =
+    model.dirs
+        |> Set.foldl (\v acc -> List.append acc (folder model v)) []
+
+
+filePage : Model -> Html Msg
+filePage model =
     div []
         [ div [ class "left-margin" ] []
         , div [ class "left-back" ]
@@ -24,7 +111,7 @@ view model =
             , button [ onClick Clear ] [ text "Clear" ]
             ]
         , div [ class "app-header" ]
-            [ h1 [] [ text "Duplicates" ]
+            [ h1 [] [ text "Duplicates FilePage" ]
             ]
         , div [ class "folders" ]
             [ div [ class "fileAction" ] [ br [] [], button [] [ text "Select" ] ]
@@ -53,7 +140,7 @@ view model =
 
 --}
         -- old
-        , Set.toList model.dirs |> folderList
+        --, Set.toList model.dirs |> folderList
         , div [] [ text ("Checked: " ++ (numFilesChecked model.sizeToPaths)) ]
         , br [] []
         , div []
@@ -226,19 +313,6 @@ sizesList model entries =
                 []
                 entries
            )
-
-
-folderList : List String -> Html msg
-folderList entries =
-    case entries of
-        [] ->
-            text ""
-
-        _ ->
-            div []
-                [ text "Folders opened:"
-                , List.map (\x -> li [] [ text x ]) entries |> ul []
-                ]
 
 
 onChange : (String -> msg) -> Attribute msg

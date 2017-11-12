@@ -25,11 +25,12 @@ type alias Model =
     , hashing : StringSet -- waiting for md5sum to be returned by system
     , selected : Maybe Int -- current size selection
     , deleted : StringSet
+    , isWindows : Bool
     }
 
 
-emptyModel : Model
-emptyModel =
+emptyModel : Bool -> Model
+emptyModel windowsFlag =
     { dirs = Set.empty
     , sizeToPaths = Dict.empty
     , pathToSize = Dict.empty
@@ -38,6 +39,7 @@ emptyModel =
     , hashing = Set.empty
     , selected = Nothing
     , deleted = Set.empty
+    , isWindows = windowsFlag
     }
 
 
