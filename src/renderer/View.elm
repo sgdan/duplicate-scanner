@@ -76,7 +76,7 @@ appendEntry size paths entries =
         entry =
             sameSizeEntry size <| Set.size paths
     in
-        List.append entry entries
+        entry ++ entries
 
 
 fileSets : Model -> List (Html Msg)
@@ -129,7 +129,7 @@ folder model path =
 folderList : Model -> List (Html msg)
 folderList model =
     model.dirs
-        |> Set.foldl (\v acc -> List.append acc (folder model v)) []
+        |> Set.foldl (\v acc -> acc ++ (folder model v)) []
 
 
 filePage : Model -> Html Msg
@@ -160,18 +160,20 @@ type alias DisplaySet =
     }
 
 
-displaySetAction : Model -> String -> Html Msg
-displaySetAction model path =
+displaySetAction : Model -> String -> Bool -> Html Msg
+displaySetAction model path locked =
     if Set.member path model.deleted then
         div [] [ br [] [], text "DELETED" ]
     else if Set.member path model.hashing then
         div [] [ br [] [], text "HASHING" ]
+    else if model.safeMode && locked then
+        div [] [ br [] [], text "LOCKED" ]
     else
         button [ onClick (DeleteFile path) ] [ text "Delete" ]
 
 
-displaySetEntry : Model -> String -> String -> List (Html Msg)
-displaySetEntry model path style =
+displaySetEntry : Model -> String -> String -> Bool -> List (Html Msg)
+displaySetEntry model path style locked =
     let
         plat =
             platform model
@@ -183,7 +185,7 @@ displaySetEntry model path style =
             Path.takeDirectory plat path
     in
         [ div [ class "fileAction" ]
-            [ (displaySetAction model path)
+            [ (displaySetAction model path locked)
             ]
         , div [ class ("fileIcon " ++ style) ] [ br [] [], text "FILE" ]
         , div [ class "fileName" ]
@@ -193,10 +195,21 @@ displaySetEntry model path style =
         ]
 
 
-displaySetEntries : Model -> List (Maybe String) -> String -> List (Html Msg)
-displaySetEntries model paths style =
-    List.filterMap identity paths
-        |> List.foldl (\v acc -> List.append (displaySetEntry model v style) acc) []
+displaySetEntries : Model -> List (Maybe String) -> String -> Bool -> List (Html Msg)
+displaySetEntries model maybePaths style locked =
+    let
+        paths =
+            List.filterMap identity maybePaths
+    in
+        paths
+            |> List.foldl (\v acc -> acc ++ (displaySetEntry model v style locked)) []
+
+
+shouldLock : Model -> Array String -> Bool
+shouldLock model paths =
+    Array.filter (\v -> Set.member v model.deleted |> not) paths
+        |> Array.length
+        |> (>=) 1
 
 
 displaySet : DisplaySet -> List (Html Msg)
@@ -204,6 +217,9 @@ displaySet dset =
     let
         paths =
             Set.toList dset.paths |> Array.fromList
+
+        locked =
+            shouldLock dset.model paths
 
         n =
             Array.length paths
@@ -217,17 +233,17 @@ displaySet dset =
                 |> List.map (\v -> Just v)
     in
         if n == 1 then
-            displaySetEntries dset.model [ first ] "onlyIcon"
+            displaySetEntries dset.model [ first ] "onlyIcon" locked
         else
-            displaySetEntries dset.model [ first ] "firstIcon"
-                ++ displaySetEntries dset.model middle "middleIcon"
-                ++ displaySetEntries dset.model [ Array.get (n - 1) paths ] "lastIcon"
+            displaySetEntries dset.model [ first ] "firstIcon" locked
+                ++ displaySetEntries dset.model middle "middleIcon" locked
+                ++ displaySetEntries dset.model [ Array.get (n - 1) paths ] "lastIcon" locked
 
 
 displaySets : Model -> List (Html Msg)
 displaySets model =
     toDisplay model
-        |> List.foldl (\v acc -> List.append (displaySet v) acc) []
+        |> List.foldl (\v acc -> acc ++ (displaySet v)) []
 
 
 toDisplay : Model -> List DisplaySet
@@ -239,11 +255,11 @@ toDisplay model =
         hd =
             hashDisplays model hashes
     in
-        List.append hd
-            [ { model = model
-              , paths = model.hashing
-              }
-            ]
+        hd
+            ++ [ { model = model
+                 , paths = model.hashing
+                 }
+               ]
 
 
 hashDisplays : Model -> StringSet -> List DisplaySet
