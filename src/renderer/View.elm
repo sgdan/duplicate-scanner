@@ -37,7 +37,7 @@ folderPage model =
             ]
         , div [ class "folders" ] (folderList model)
         , div [ class "checked" ]
-            [ span [ class "alignBottom" ] [ checked model ]
+            [ span [ class "alignBottom" ] [ checkedMsg model ]
             ]
         , div [ class "content" ] (fileSets model)
         ]
@@ -84,8 +84,8 @@ fileSets model =
         |> Dict.foldl appendEntry []
 
 
-checked : Model -> Html msg
-checked model =
+checkedMsg : Model -> Html msg
+checkedMsg model =
     let
         count =
             numFilesChecked model.sizeToPaths
@@ -140,19 +140,16 @@ filePage model =
             , button [ onClick Close ] [ text "Close" ]
             ]
         , div [ class "right-buttons" ]
-            [ button [ onClick OpenFolder ] [ text "Safe" ]
+            [ br [] []
+            , input [ type_ "checkbox", checked model.safeMode, onClick ToggleSafe ] []
+            , text
+                "Safe Mode"
             ]
         , div [ class "app-header" ]
-            [ h1 [] [ text "Duplicates FilePage" ]
+            [ h1 [] [ text "Duplicates" ]
             ]
         , div [ class "files" ]
-            [ div [ class "fileAction" ] [ br [] [], button [] [ text "Delete" ] ]
-            , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
-            , div [ class "fileName" ]
-                [ span [ class "fileNameText" ] [ text "File Name" ]
-                ]
-            , div [ class "filePath" ] [ text "C:\\six\\five\\four\\three\\two\\one" ]
-            ]
+            (displaySets model)
         ]
 
 
@@ -160,6 +157,52 @@ type alias DisplaySet =
     { model : Model
     , paths : StringSet
     }
+
+
+displaySetAction : Model -> String -> Html Msg
+displaySetAction model path =
+    if Set.member path model.deleted then
+        div [] [ br [] [], text "DELETED" ]
+    else if Set.member path model.hashing then
+        div [] [ br [] [], text "HASHING" ]
+    else
+        button [ onClick (DeleteFile path) ] [ text "Delete" ]
+
+
+displaySetEntry : Model -> String -> List (Html Msg)
+displaySetEntry model path =
+    let
+        plat =
+            platform model
+
+        name =
+            Path.takeFileName plat path
+
+        dir =
+            Path.takeDirectory plat path
+    in
+        [ div [ class "fileAction" ]
+            [ (displaySetAction model path)
+            ]
+        , div [ class "fileIcon" ] [ br [] [], text "FILE" ]
+        , div [ class "fileName" ]
+            [ span [ class "fileNameText" ] [ text name ]
+            ]
+        , div [ class "filePath" ] [ text dir ]
+        ]
+
+
+displaySet : DisplaySet -> List (Html Msg)
+displaySet dset =
+    dset.paths
+        |> Set.toList
+        |> List.foldl (\v acc -> List.append (displaySetEntry dset.model v) acc) []
+
+
+displaySets : Model -> List (Html Msg)
+displaySets model =
+    toDisplay model
+        |> List.foldl (\v acc -> List.append (displaySet v) acc) []
 
 
 toDisplay : Model -> List DisplaySet
@@ -180,7 +223,7 @@ toDisplay model =
 
 hashDisplays : Model -> StringSet -> List DisplaySet
 hashDisplays model selected =
-    (Set.toList selected)
+    Set.toList selected
         |> List.map
             (\hash ->
                 { model = model
@@ -208,63 +251,6 @@ selectedHashes model =
         Just size ->
             Dict.get size model.sizeToHashes
                 |> Maybe.withDefault Set.empty
-
-
-resultsTable : Int -> Model -> Html Msg
-resultsTable size model =
-    let
-        files =
-            List.foldl (\v acc -> List.append acc (pathSetDisplay v)) [] <|
-                toDisplay model
-    in
-        div [ class "divTable" ]
-            [ div [ class "divTableBody" ]
-                files
-            ]
-
-
-pathSetDisplay : DisplaySet -> List (Html Msg)
-pathSetDisplay ds =
-    let
-        pathList =
-            Set.toList ds.paths
-    in
-        div [ class "divTableRow" ]
-            [ div [] [ br [] [] ] ]
-            :: (List.map (\v -> pathRow ds.model v) pathList)
-
-
-canDelete : Model -> String -> Bool
-canDelete model path =
-    Set.member path model.deleted
-        || Set.member path model.hashing
-        |> not
-
-
-pathRow : Model -> String -> Html Msg
-pathRow model path =
-    let
-        showDelete =
-            canDelete model path
-
-        deleteCell =
-            if showDelete then
-                button [ onClick (DeleteFile path) ] [ text "Delete" ]
-            else if Set.member path model.hashing then
-                div [] [ text "Hashing..." ]
-            else
-                div [] [ text "" ]
-
-        cell =
-            if showDelete then
-                class "normal-cell"
-            else
-                class "deleted-cell"
-    in
-        div [ class "divTableRow" ]
-            [ div [ cell ] [ deleteCell ]
-            , div [ cell ] [ text path ]
-            ]
 
 
 formatSize : Int -> String

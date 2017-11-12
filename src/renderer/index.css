@@ -91,7 +91,7 @@ button {
 
 .fileName {
     display: flex;
-    font-size: 18;
+    font-size: 12px;
     height: 30px;
 }
 
@@ -101,4 +101,5 @@ button {
 
 .filePath {
     height: 15px;
+    font-size: 10px;
 }

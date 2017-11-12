@@ -26,6 +26,7 @@ type alias Model =
     , selected : Maybe Int -- current size selection
     , deleted : StringSet
     , isWindows : Bool
+    , safeMode : Bool
     }
 
 
@@ -40,6 +41,7 @@ emptyModel windowsFlag =
     , selected = Nothing
     , deleted = Set.empty
     , isWindows = windowsFlag
+    , safeMode = True
     }
 
 
@@ -54,3 +56,4 @@ type Msg
     | DeleteFile String
     | FileDeleted String
     | Close
+    | ToggleSafe

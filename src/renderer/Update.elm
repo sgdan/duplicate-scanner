@@ -45,6 +45,9 @@ update msg model =
         HashAdded value ->
             ( updateByHash value model, Cmd.none )
 
+        ToggleSafe ->
+            ( { model | safeMode = not model.safeMode }, Cmd.none )
+
 
 processSizeSelection : Int -> Model -> ( Model, Cmd Msg )
 processSizeSelection sizeInBytes model =
