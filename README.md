@@ -31,6 +31,6 @@ yarn dev
 # TODO
 
 - Clean up UI!
-- Provide delete option in the UI so duplicate files can be removed
 - Package into executable format
 - List by update date as well as size? sort in UI?
+- Mark visited/selected entries on folder page?

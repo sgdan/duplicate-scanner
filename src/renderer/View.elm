@@ -26,6 +26,7 @@ folderPage : Model -> Html Msg
 folderPage model =
     div []
         [ div [ class "left-margin" ] []
+        , div [ class "right-margin" ] []
         , div [ class "left-back" ]
             [ button [ onClick Close ] [ text "Close" ]
             ]
@@ -60,9 +61,9 @@ sameSizeEntry sizeInBytes numFiles =
             (toString numFiles) ++ " files"
     in
         [ div [ class "fileAction" ]
-            [ button [ onClick <| SelectSize sizeInBytes ] [ text "Select" ]
+            [ button [ onClick <| SelectSize sizeInBytes, class "selectButton" ] []
             ]
-        , div [ class "fileIcon" ] [ br [] [], text "FILESET" ]
+        , div [ class "fileIcon" ] [ img [ src "images/files-icon.png" ] [] ]
         , div [ class "fileName" ]
             [ span [ class "fileNameText" ] [ text sizeDesc ]
             ]
@@ -118,7 +119,7 @@ folder model path =
             Path.takeDirectory plat path
     in
         [ div [ class "fileAction" ] []
-        , div [ class "fileIcon" ] [ br [] [], text "FOLDER" ]
+        , div [ class "fileIcon" ] [ img [ src "images/open-folder-icon.png" ] [] ]
         , div [ class "fileName" ]
             [ span [ class "fileNameText" ] [ text name ]
             ]
@@ -136,8 +137,9 @@ filePage : Model -> Html Msg
 filePage model =
     div []
         [ div [ class "left-margin" ] []
+        , div [ class "right-margin" ] []
         , div [ class "left-back" ]
-            [ button [ onClick Back ] [ text "Back" ]
+            [ button [ onClick Back, class "backButton" ] []
             , button [ onClick Close ] [ text "Close" ]
             ]
         , div [ class "right-buttons" ]
@@ -163,13 +165,13 @@ type alias DisplaySet =
 displaySetAction : Model -> String -> Bool -> Html Msg
 displaySetAction model path locked =
     if Set.member path model.deleted then
-        div [] [ br [] [], text "DELETED" ]
+        div [] [ img [ src "images/deleted-file.png" ] [] ]
     else if Set.member path model.hashing then
         div [] [ br [] [], text "HASHING" ]
     else if model.safeMode && locked then
-        div [] [ br [] [], text "LOCKED" ]
+        div [] [ img [ src "images/locked.png" ] [] ]
     else
-        button [ onClick (DeleteFile path) ] [ text "Delete" ]
+        button [ onClick (DeleteFile path), class "deleteButton" ] []
 
 
 displaySetEntry : Model -> String -> String -> Bool -> List (Html Msg)
@@ -187,7 +189,7 @@ displaySetEntry model path style locked =
         [ div [ class "fileAction" ]
             [ (displaySetAction model path locked)
             ]
-        , div [ class ("fileIcon " ++ style) ] [ br [] [], text "FILE" ]
+        , div [ class ("fileIcon " ++ style) ] [ img [ src "images/file-icon.png" ] [] ]
         , div [ class "fileName" ]
             [ span [ class "fileNameText" ] [ text name ]
             ]

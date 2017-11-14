@@ -7,6 +7,7 @@ body {
     color: #444444;
     font-size: 12px;
     overflow: hidden;
+    background: rgba(0, 0, 0, 0);
 }
 
 h1 {
@@ -24,11 +25,19 @@ button {
     width: 600px;
     height: 600px;
     margin: auto;
-    background-image: url(images/background.jpg);
+    background-image: url(images/background.png);
 }
 
 .left-margin {
     float: left;
+    width: 10%;
+    height: 100%;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
+
+.right-margin {
+    float: right;
     width: 10%;
     height: 100%;
     -webkit-app-region: drag;
@@ -49,6 +58,11 @@ button {
 
 .app-header {
     height: 10%;
+    /*
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    */
+    border: 1;
 }
 
 .checked {
@@ -67,12 +81,12 @@ button {
 }
 
 .content {
-    height: 60%;
+    height: 50%;
     overflow-y: auto;
 }
 
 .files {
-    height: 90%;
+    height: 80%;
     overflow-y: auto;
 }
 
@@ -84,19 +98,19 @@ button {
 }
 
 .onlyIcon {
-    background: url(images/only-icon-bg.png)
+    background: url(images/only.png)
 }
 
 .firstIcon {
-    background: url(images/first-icon-bg.png)
+    background: url(images/first.png)
 }
 
 .middleIcon {
-    background: url(images/middle-icon-bg.png)
+    background: url(images/middle.png)
 }
 
 .lastIcon {
-    background: url(images/last-icon-bg.png)
+    background: url(images/last.png)
 }
 
 .fileAction {
@@ -117,5 +131,50 @@ button {
 
 .filePath {
     height: 15px;
-    font-size: 10px;
+    font-size: 8px;
+}
+
+.selectButton {
+    background: url(images/select-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.selectButton:hover {
+    background: url(images/select-button-highlight.png);
+}
+
+.selectButton:focus {
+    background: url(images/select-button-down.png)
+}
+
+.backButton {
+    background: url(images/back-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.backButton:hover {
+    background: url(images/back-button-highlight.png);
+}
+
+.backButton:focus {
+    background: url(images/back-button-down.png)
+}
+
+.deleteButton {
+    background: url(images/delete-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.deleteButton:hover {
+    background: url(images/delete-button-highlight.png);
+}
+
+.backButton:focus {
+    background: url(images/delete-button-down.png)
 }

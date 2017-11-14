@@ -22,7 +22,13 @@ function doIt() {
 
 app.on('ready', function () {
   // Create the "renderer" window which contains the visible UI
-  renderer = new BrowserWindow({ width: 1200, height: 600, frame: false })
+  renderer = new BrowserWindow({
+    width: 1200,
+    height: 600,
+    frame: false,
+    transparent: true,
+    toolbar: false
+  })
   renderer.setMenu(null)
   //renderer.setResizable(false)
   renderer.loadURL(`file://${__dirname}/src/renderer/index.html`)
