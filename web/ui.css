@@ -1,0 +1,180 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    font-family: Arial, Helvetica, Verdana, Geneva, Tahoma, sans-serif;
+    color: #444444;
+    font-size: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0);
+}
+
+h1 {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    padding: 5px;
+    margin: 5px;
+}
+
+.app-container {
+    width: 600px;
+    height: 600px;
+    margin: auto;
+    background-image: url(images/background.png);
+}
+
+.left-margin {
+    float: left;
+    width: 10%;
+    height: 100%;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
+
+.right-margin {
+    float: right;
+    width: 10%;
+    height: 100%;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
+
+.left-back {
+    float: left;
+    width: 20%;
+    height: 10%;
+}
+
+.right-buttons {
+    float: right;
+    width: 20%;
+    height: 10%;
+}
+
+.app-header {
+    height: 10%;
+    /*
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    */
+    border: 1;
+}
+
+.checked {
+    height: 5%;
+    display: flex;
+}
+
+.alignBottom {
+    align-self: flex-end;
+    padding: 5px;
+}
+
+.folders {
+    height: 25%;
+    overflow-y: auto;
+}
+
+.content {
+    height: 50%;
+    overflow-y: auto;
+}
+
+.files {
+    height: 80%;
+    overflow-y: auto;
+}
+
+.fileIcon {
+    float: left;
+    width: 90px;
+    height: 45px;
+    text-align: center;
+}
+
+.onlyIcon {
+    background: url(images/only.png)
+}
+
+.firstIcon {
+    background: url(images/first.png)
+}
+
+.middleIcon {
+    background: url(images/middle.png)
+}
+
+.lastIcon {
+    background: url(images/last.png)
+}
+
+.fileAction {
+    float: right;
+    width: 90px;
+    height: 45px;
+}
+
+.fileName {
+    display: flex;
+    font-size: 12px;
+    height: 30px;
+}
+
+.fileNameText {
+    align-self: flex-end;
+}
+
+.filePath {
+    height: 15px;
+    font-size: 8px;
+}
+
+.selectButton {
+    background: url(images/select-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.selectButton:hover {
+    background: url(images/select-button-highlight.png);
+}
+
+.selectButton:focus {
+    background: url(images/select-button-down.png)
+}
+
+.backButton {
+    background: url(images/back-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.backButton:hover {
+    background: url(images/back-button-highlight.png);
+}
+
+.backButton:focus {
+    background: url(images/back-button-down.png)
+}
+
+.deleteButton {
+    background: url(images/delete-button-up.png);
+    width: 60px;
+    height: 40px;
+    border: none;
+}
+
+.deleteButton:hover {
+    background: url(images/delete-button-highlight.png);
+}
+
+.backButton:focus {
+    background: url(images/delete-button-down.png)
+}

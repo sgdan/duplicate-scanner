@@ -1,23 +1,25 @@
 {
   "name": "duplicate-scanner",
   "version": "0.0.1",
-  "description": "",
-  "main": "main.js",
+  "description": "Utility to identify and delete duplicate files",
   "scripts": {
-    "test": "elm-test",
-    "dev": "concurrently -k \"webpack-dev-server\" \"electron .\""
+    "test": "jjs tests/test.js",
+    "postinstall": "elm package install -y",
+    "prestart": "nugget https://github.com/sgdan/javascript-app-wrapper/releases/download/v0.0.1/javascript-app-wrapper-0.0.1.jar -c -o wrapper.jar",
+    "start": "concurrently -k \"brunch watch\" \"java -jar wrapper.jar\"",
+    "dev": "concurrently -k \"brunch watch\" \"java -jar wrapper.jar\""
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Simon Daniel",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "brunch": "2.10.12",
     "bluebird": "3.5.1",
-    "concurrently": "3.5.0",
-    "electron": "1.7.9",
+    "concurrently": "3.5.1",
+    "elm": "0.18.0",
     "elm-format": "0.6.1-alpha",
     "elm-test": "0.18.9",
-    "elm-webpack-loader": "4.4.0",
-    "webpack": "3.8.1",
-    "webpack-dev-server": "2.9.4"
+    "elm-brunch": "0.10.0",
+    "nugget": "2.0.1"
   }
 }

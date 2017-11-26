@@ -4,7 +4,7 @@
     "repository": "https://github.com/sgdan/duplicate-scanner.git",
     "license": "MIT",
     "source-directories": [
-        "src/renderer"
+        "elm"
     ],
     "exposed-modules": [],
     "dependencies": {
