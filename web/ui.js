@@ -1,10 +1,7 @@
 'use strict';
 
-//const os = require('os')
 var node = document.getElementById('main')
-const elmApp = Elm.Main.embed(node, {
-    isWindows: true //os.platform() == 'win32'
-})
+const elmApp = Elm.Main.embed(node)
 
 function addDir(dir) {
     elmApp.ports.addDir.send(dir.toString())

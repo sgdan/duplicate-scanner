@@ -7,14 +7,9 @@ import Ports exposing (..)
 import Html exposing (..)
 
 
-type alias Flags =
-    { isWindows : Bool
-    }
-
-
-main : Program Flags Model Msg
+main : Program Never Model Msg
 main =
-    programWithFlags
+    program
         { init = init
         , update = update
         , view = view
@@ -22,9 +17,9 @@ main =
         }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    ( emptyModel flags.isWindows, Cmd.none )
+init : ( Model, Cmd Msg )
+init =
+    ( emptyModel, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

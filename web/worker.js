@@ -16,7 +16,8 @@ var Chooser = Java.extend(Runnable, {
         var chosen = chooser.showDialog(null)
         if (chosen != null) {
             currentDir = chosen
-            ui.send("addDir", chosen.absolutePath, "2val")
+            var path = chosen.toURI().toURL().toString().replaceAll("^file:/|/$","")
+            ui.send("addDir", path, "2val")
             checkFolder(chosen)
         } 
     }
@@ -35,7 +36,9 @@ function checkFolder(dir) {
         if (file.isDirectory()) checkFolder(file)
         else {
             var size = file.length()
-            if (size > 0) ui.send("addFile", file.absolutePath, size)
+            var path = file.toURI().toURL().toString().replace("file:/", "")
+            path = path.replaceAll("%20", " ")
+            if (size > 0) ui.send("addFile", path, size)
         }
     }
 }

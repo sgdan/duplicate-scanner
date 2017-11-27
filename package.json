@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jjs tests/test.js",
     "postinstall": "elm package install -y",
-    "prestart": "nugget https://github.com/sgdan/javascript-app-wrapper/releases/download/v0.0.1/javascript-app-wrapper-0.0.1.jar -c -o wrapper.jar",
+    "prestart": "nugget https://github.com/sgdan/javascript-app-wrapper/releases/download/v0.0.1/javascript-app-wrapper-0.0.2.jar -c -o wrapper.jar",
     "start": "concurrently -k \"brunch watch\" \"java -jar wrapper.jar\"",
     "dev": "concurrently -k \"brunch watch\" \"java -jar wrapper.jar\""
   },

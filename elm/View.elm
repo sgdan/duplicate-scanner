@@ -8,7 +8,7 @@ import Dict exposing (Dict)
 import Set exposing (Set)
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Path.Generic as Path
+import Path.Url as Path
 import Array exposing (Array)
 
 
@@ -98,25 +98,14 @@ checkedMsg model =
             text <| "Checked " ++ count ++ " files"
 
 
-platform : Model -> Path.Platform
-platform model =
-    if model.isWindows then
-        Path.Windows
-    else
-        Path.Posix
-
-
 folder : Model -> String -> List (Html msg)
 folder model path =
     let
-        plat =
-            platform model
-
         name =
-            Path.takeFileName plat path
+            Path.takeFileName path
 
         dir =
-            Path.takeDirectory plat path
+            Path.takeDirectory path
     in
         [ div [ class "fileAction" ] []
         , div [ class "fileIcon" ] [ img [ src "images/open-folder-icon.png" ] [] ]
@@ -177,14 +166,11 @@ displaySetAction model path locked =
 displaySetEntry : Model -> String -> String -> Bool -> List (Html Msg)
 displaySetEntry model path style locked =
     let
-        plat =
-            platform model
-
         name =
-            Path.takeFileName plat path
+            Path.takeFileName path
 
         dir =
-            Path.takeDirectory plat path
+            Path.takeDirectory path
     in
         [ div [ class "fileAction" ]
             [ (displaySetAction model path locked)
