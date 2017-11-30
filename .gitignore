@@ -3,3 +3,5 @@ elm-stuff/
 node_modules/
 .project
 /web/main.js
+/wrapper.jar
+/duplicate-scanner.jar

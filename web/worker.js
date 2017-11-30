@@ -3,7 +3,23 @@ var DirectoryChooser = javafx.stage.DirectoryChooser
 var Platform = javafx.application.Platform
 var Runnable = java.lang.Runnable
 var File = java.io.File
-var System = java.lang.System
+var Platform = javafx.application.Platform
+var Image = javafx.scene.image.Image
+
+/**
+ * Set up the window
+ */
+Platform.runLater(function() {
+    var stage = wrapper.currentStage
+    stage.setResizable(false)
+    stage.width = 615
+    stage.height = 640
+    var title = stage.titleProperty()
+    title.unbind()
+    title.value = "Duplicate File Scanner"
+    stage.icons.add(new Image(wrapper.findResource("images/icon.png")))
+    //stage.icons.clear()
+})
 
 load("web/hash.js")
 var currentDir = new File(".")
@@ -25,10 +41,6 @@ var Chooser = Java.extend(Runnable, {
 
 function openFolder() {
     Platform.runLater(new Chooser()) // JavaFX thread
-}
-
-function exit() {
-    System.exit(0)
 }
 
 function checkFolder(dir) {
