@@ -18,7 +18,6 @@ Platform.runLater(function() {
     title.unbind()
     title.value = "Duplicate File Scanner"
     stage.icons.add(new Image(wrapper.findResource("images/icon.png")))
-    //stage.icons.clear()
 })
 
 load("web/hash.js")
