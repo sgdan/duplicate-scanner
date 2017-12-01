@@ -20,7 +20,7 @@ Platform.runLater(function() {
     stage.icons.add(new Image(wrapper.findResource("images/icon.png")))
 })
 
-load("web/hash.js")
+load(wrapper.findResource("hash.js"))
 var currentDir = new File(".")
 
 var Chooser = Java.extend(Runnable, {
